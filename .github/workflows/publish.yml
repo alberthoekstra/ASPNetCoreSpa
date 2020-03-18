@@ -1,0 +1,25 @@
+name: Publish
+on: [push]
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        steps: 
+            - uses: actions/setup-node@v1
+              with:
+                node-version: 10.x
+            - uses: actions/checkout@v2
+            - uses: actions/cache@v1.1.2
+              with:
+                  path: ./ClientApp/node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                    ${{ runner.os }}-node-
+            - uses: actions/setup-dotnet@v1
+              with:
+                dotnet-version: '3.1.100'
+            - run: dotnet publish --configuration Release --output ./dist
+            - uses: actions/upload-artifact@v1
+              with:
+                name: release-files
+                path: ./dist
